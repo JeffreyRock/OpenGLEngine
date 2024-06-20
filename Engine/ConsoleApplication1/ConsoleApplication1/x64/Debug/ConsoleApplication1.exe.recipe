@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>J:\Engine\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe</FullPath>
+      <FullPath>J:\OpenGLEngine\Engine\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
