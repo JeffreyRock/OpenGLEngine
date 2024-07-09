@@ -142,7 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
-    <ClCompile Include="GLFW\glfw-3.4.bin.WIN64\glad.c" />
+    <ClCompile Include="glad.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shaders\Fragment.txt" />

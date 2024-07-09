@@ -21,6 +21,7 @@ void OpenGLFuctionThatDrawsOurTriangle();
 
 int main(void)
 {
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -47,16 +48,15 @@ int main(void)
 	float vertices[] = {
 		0.5f, 0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, // Added missing comma
+		-0.5f, -0.5f, 0.0f,
 		-0.5f, 0.5f, 0.0f
 		
 	};
 
 
 	unsigned int indices[] = {
-		0,1,2,
-		2,3,4
+		0,1,3,
+		1,2,3
 	};
 
 	unsigned int EBO;
@@ -90,7 +90,13 @@ int main(void)
 		
 		glfwSwapBuffers(window);
 		
-		//OpenGLFuctionThatDrawsOurTriangle();
+		float timeV = glfwGetTime();
+		float GreenValue = (sin(timeV) / 2.0f) + 0.5f;
+		float redValue = (cos(timeV) / 2.0f) + 0.5f;
+		float yellowValue = (tan(timeV) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(ShaderProgram, "ourColor");
+		glUniform4f(vertexColorLocation, redValue, GreenValue, yellowValue, 1.0f);
+
 		
 	}
 	glDeleteShader(ShaderProgram);
@@ -115,7 +121,7 @@ unsigned int Make_Shader(const string ShaderFilePath, const string FragFilePath)
 		glGetProgramInfoLog(shader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<
 			infoLog << std::endl;
-		return NULL;
+		return 0;
 	}
 	for (unsigned int shaderModule : modules) {
 		glDeleteShader(shaderModule);
@@ -149,7 +155,7 @@ unsigned int ImportShaders(const string FilePath, unsigned int module_type) {
 		glGetShaderInfoLog(shaderModule, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<
 			infoLog << std::endl;
-		return NULL;
+		return 0;
 	}
 	return shaderModule;
 };
