@@ -1,4 +1,2 @@
 ﻿  ConsoleApplication1.cpp
-J:\OpenGLEngine\Engine\ConsoleApplication1\ConsoleApplication1\ConsoleApplication1.cpp(93,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   ConsoleApplication1.vcxproj -> J:\OpenGLEngine\Engine\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe

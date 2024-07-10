@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "Shader.h"
+
 using namespace std;
 
 void frameBufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -22,11 +24,16 @@ void OpenGLFuctionThatDrawsOurTriangle();
 int main(void)
 {
 
+	
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
+
+	
+
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Learn Open GL", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create Open GL window" << std::endl;
@@ -44,64 +51,73 @@ int main(void)
 
 	glfwSetFramebufferSizeCallback(window, frameBufferSizeCallback);
 
+	
 
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f
-		
+		// positions // colors
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+		0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f // top
 	};
-
 
 	unsigned int indices[] = {
-		0,1,3,
-		1,2,3
+	0, 1, 2
 	};
 
-	unsigned int EBO;
-	unsigned int ShaderProgram = Make_Shader("Shaders\\shader.txt", "Shaders\\Fragment.txt");
-	unsigned int VBO, VAO;
+	//unsigned int ShaderProgram = Make_Shader("Shaders\\shader.txt", "Shaders\\Fragment.txt");
+	shader ourShader("Shaders\\shader.txt", "Shaders\\Fragment.txt");
+	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	// Bind the Vertex Array Object first, then bind and set vertex buffers, and then configure vertex attributes
+	glBindVertexArray(VAO);
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glGenBuffers(1, &EBO);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// Color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
-
+	//glUseProgram(ShaderProgram);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		
-		glfwPollEvents();
-
+		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(ShaderProgram);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-		
-		glfwSwapBuffers(window);
-		
-		float timeV = glfwGetTime();
-		float GreenValue = (sin(timeV) / 2.0f) + 0.5f;
-		float redValue = (cos(timeV) / 2.0f) + 0.5f;
-		float yellowValue = (tan(timeV) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(ShaderProgram, "ourColor");
-		glUniform4f(vertexColorLocation, redValue, GreenValue, yellowValue, 1.0f);
 
-		
+		// Render the triangle
+		//glUseProgram(ShaderProgram);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+
+		ourShader.use();
+		ourShader.setFloat("someUniform", 1.0f);
+
+		// Swap buffers and poll IO events
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
-	glDeleteShader(ShaderProgram);
+
+	//glDeleteProgram(ShaderProgram);
+	//glDeleteProgram(ourShader);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &VAO);
+
 	glfwTerminate();
-	return 0; 
+	return 0;
 }
 
 unsigned int Make_Shader(const string ShaderFilePath, const string FragFilePath) {
