@@ -34,6 +34,8 @@ shader::shader(const std::string vertexPath, const std::string fragmentPath)
     catch (std::ifstream::failure e)
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        glfwTerminate();
+        return;
     }
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
@@ -94,5 +96,9 @@ void shader::setInt(const std::string& name, int value) const {
 
 void shader::setFloat(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void shader::setVec3(const std::string& name, float x, float y, float z) const {
+    glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
 }
 

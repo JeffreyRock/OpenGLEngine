@@ -8,23 +8,19 @@
 #include <sstream>
 
 #include <vector>
-
 #include "Shader.h"
 
-using namespace std;
 
-void frameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-};
+using namespace std;
 
 unsigned int ImportShaders(const string FilePath, unsigned int module_type);
 unsigned int Make_Shader(const string ShaderFilePath, const string FragFilePath);
 void OpenGLFuctionThatDrawsOurTriangle();
+void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
+void userInput(GLFWwindow* window); //protype
 
 int main(void)
 {
-
-	
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -36,11 +32,13 @@ int main(void)
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Learn Open GL", NULL, NULL);
 	if (window == NULL) {
-		std::cout << "Failed to create Open GL window" << std::endl;
+		cout << "Failed to create Open GL window" << endl;
 		glfwTerminate();
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, frameBufferSizeCallback);
+
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		cout << "Failed to initialize glad" << endl;
@@ -54,15 +52,18 @@ int main(void)
 	
 
 	float vertices[] = {
-		// positions // colors
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-		0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f // top
+		// positions 
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+		0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // top right
+		-0.5f ,0.5f, 0.0f, 1.0f, 1.0f, 1.0f, // top left
 	};
 
 	unsigned int indices[] = {
-	0, 1, 2
+		0,1,2,
+		3,2,0
 	};
+
 
 	//unsigned int ShaderProgram = Make_Shader("Shaders\\shader.txt", "Shaders\\Fragment.txt");
 	shader ourShader("Shaders\\shader.txt", "Shaders\\Fragment.txt");
@@ -85,13 +86,20 @@ int main(void)
 	glEnableVertexAttribArray(0);
 	// Color attribute
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(VBO);
 
 	glBindVertexArray(0);
 	//glUseProgram(ShaderProgram);
 
 	while (!glfwWindowShouldClose(window))
 	{
+		userInput(window);
+		float time = glfwGetTime();
+		float r = (sin(time) + 1.0f / 2.0f);
+		float g = (cos(time) + 1.0f / 2.0f);
+		float b = (tan(time) + 1.0f / 2.0f);
+		ourShader.setVec3("dynamicColor", r, g, b);
+
 		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -99,11 +107,10 @@ int main(void)
 		// Render the triangle
 		//glUseProgram(ShaderProgram);
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		ourShader.use();
-		ourShader.setFloat("someUniform", 1.0f);
 
 		// Swap buffers and poll IO events
 		glfwSwapBuffers(window);
@@ -175,3 +182,18 @@ unsigned int ImportShaders(const string FilePath, unsigned int module_type) {
 	}
 	return shaderModule;
 };
+
+void frameBufferSizeCallback(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
+}
+
+
+void userInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		std::cout << "W has been pressed" << std::endl;
+	}
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+}
+
